@@ -29,10 +29,26 @@
     </tbody>
   </table>
 
+  <h3>Keranjang Belanja</h3>
+  <table class="table table-striped-columns table-bordered border-primary" id="daftar-keranjang">
+    <thead class="table-primary">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Item</th>
+        <th scope="col">Harga</th>
+        <th scope="col">Jumlah</th>
+        <th scope="col">Hapus Dari Keranjang</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+
   <script type="module">
-    import { ambilDaftarBarang } from './main.js';
+    import { ambilDaftarBarang, tambahBarangKeKeranjang } from './main.js';
 
     $(document).ready(async function() {
+      // menampilkan daftar barang di inventory
       let elemenDaftarBarang = $("#daftar-barang > tbody");
       let daftarBarang = await ambilDaftarBarang();
 
@@ -45,16 +61,30 @@
           "<td>" + nomor + "</td>" +
           "<td>" + data.item + "</td>" +
           "<td>" + data.harga + "</td>" +
-          "<td>" + "<a href='#' class='me-2 link-keranjang' data='" + data.id + "'><i class='bi bi-cart-plus'></i></a>" + "</td>" +
+          "<td>" + "<a href='#' class='me-2 link-keranjang' data='" + data.id + "' data-nama='" + data.item + "' data-harga='" + data.harga + "'><i class='bi bi-cart-plus'></i></a>" + "</td>" +
           "</tr>"
         )
 
         nomor = nomor + 1
       })
+      // selesai menampilkan barang di inventory
 
+      // menambah barang ke keranjang
       $(".link-keranjang").click(async function() {
+        let idbarang = $(this).attr('data')
+        let nama = $(this).attr('data-nama')
+        let harga = $(this).attr('data-harga')
+        let jumlah = 1
+        let idpelanggan = 'proses'
+        let namapelanggan = 'proses'
+        
+        await tambahBarangKeKeranjang(idbarang, nama, harga, jumlah, idpelanggan, namapelanggan)
+        
         console.log("menambah barang ke keranjang")
       })
+      
+      // menampilkan daftar barang yang ada di keranjang
+      
     })
   </script>
 </body>
