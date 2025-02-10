@@ -45,7 +45,7 @@
   </table>
 
   <script type="module">
-    import { ambilDaftarBarang, tambahBarangKeKeranjang } from './main.js';
+    import { ambilDaftarBarang, tambahBarangKeKeranjang, ambilDaftarBarangDiKeranjang } from './main.js';
 
     $(document).ready(async function() {
       // menampilkan daftar barang di inventory
@@ -81,10 +81,32 @@
         await tambahBarangKeKeranjang(idbarang, nama, harga, jumlah, idpelanggan, namapelanggan)
         
         console.log("menambah barang ke keranjang")
+        
+        // menampilkan daftar barang yang ada di keranjang
+        let elemenDaftarBarangDiKeranjang = $("#daftar-keranjang > tbody")
+        let daftarBarangDiKeranjang = await ambilDaftarBarangDiKeranjang()
+        let nomorKeranjang = 1
+        let totalKeranjang = 0
+        
+        // mengosongkan daftar barang sebelumnya
+        elemenDaftarBarangDiKeranjang.empty()
+        
+        daftarBarangDiKeranjang.forEach((data) => {
+          elemenDaftarBarangDiKeranjang.append(
+            "<tr>" +
+            "<td>" + nomorKeranjang + "</td>" +
+            "<td>" + data.nama + "</td>" +
+            "<td>" + data.harga + "</td>" +
+            "<td>" + data.jumlah + "</td>" +
+            "<td>" + "link hapus" + "</td>" +
+            "</tr>"
+          )
+          
+          nomorKeranjang++
+        })
+        // selesai menampilkan barang di keranjang
+        
       })
-      
-      // menampilkan daftar barang yang ada di keranjang
-      
     })
   </script>
 </body>
