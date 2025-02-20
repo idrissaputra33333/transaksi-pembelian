@@ -11,16 +11,17 @@ import {
   query,
   orderBy
 } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js'
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
+// ini adalah konfigurasi firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyDFYmmVvk-jLZIeAdYKiTwVw2jqd4VINFA",
-  authDomain: "insan-cemerlang.firebaseapp.com",
-  projectId: "insan-cemerlang",
-  storageBucket: "insan-cemerlang.appspot.com",
-  messagingSenderId: "579109661574",
-  appId: "1:579109661574:web:4a7cd4060f70eded945a07"
-};
+apiKey: "AIzaSyCRRFaBrm14cIoJ1nW5knt4Afd10H402Lo",
+    authDomain: "insan-cemerlang-bbed3.firebaseapp.com",
+    projectId: "insan-cemerlang-bbed3",
+    storageBucket: "insan-cemerlang-bbed3.appspot.com",
+    messagingSenderId: "1014883164148",
+    appId: "1:1014883164148:web:f4c238c0022fb007eee3a1",
+    measurementId: "G-81DKK8YWJT"
+  };
 
 //inisialisasi firebase
 const aplikasi = initializeApp(firebaseConfig)
@@ -31,7 +32,7 @@ export async function ambilDaftarBarang() {
   const refDokumen = collection(basisdata, "inventory");
   const kueri = query(refDokumen, orderBy("item"));
   const cuplikanKueri = await getDocs(kueri);
-
+  
   let hasilKueri = [];
   cuplikanKueri.forEach((dokumen) => {
     hasilKueri.push({
@@ -41,7 +42,7 @@ export async function ambilDaftarBarang() {
       harga: dokumen.data().harga
     })
   })
-
+  
   return hasilKueri;
 }
 
@@ -55,16 +56,41 @@ export async function tambahBarangKeKeranjang(
   namapelanggan
 ) {
   try {
-    // menyimpan data ke collection transaksi
-    const refDokumen = await addDoc(collection(basisdata, "transaksi"), {
-      idbarang: idbarang,
-      nama: nama,
-      harga: harga,
-      jumlah: jumlah,
-      idpelanggan: idpelanggan,
-      namapelanggan: namapelanggan
+    // periksa apakah idbarang sudah ada di collection transaksi?
+    
+    // mengambil data di seluruh collection transaksi
+    let refDokumen = collection(basisdata, "transaksi")
+    
+    // membuat query untuk mencari data berdasarkan idbarang
+    let queryBarang = query(refDokumen, where("idbarang", "==", idbarang))
+    
+    let snapshotBarang = await getDocs(queryBarang)
+    let jumlahRecord = 0
+    let idtransaksi = ''
+    let jumlahSebelumnya = 0
+    
+    snapshotBarang.forEach((dokumen) => {
+      jumlahRecord++
+      idtransaksi = dokumen.id
+      jumlahSebelumnya = dokumen.data().jumlah
     })
-
+    
+    if (jumlahRecord == 0) {
+      // kalau belum ada, tambahkan langsung ke collection
+      const refDokumen = await addDoc(collection(basisdata, "transaksi"), {
+        idbarang: idbarang,
+        nama: nama,
+        harga: harga,
+        jumlah: jumlah,
+        idpelanggan: idpelanggan,
+        namapelanggan: namapelanggan
+      })
+    } else if (jumlahRecord == 1) {
+      // kalau sudah ada, tambahkan jumlahnya saja
+      jumlahSebelumnya++
+      await updateDoc(doc(basisdata, "transaksi", idtransaksi), { jumlah: jumlahSebelumnya })
+    }
+    
     // menampilkan pesan berhasil
     console.log("berhasil menyimpan keranjang")
   } catch (error) {
@@ -78,7 +104,7 @@ export async function ambilDaftarBarangDiKeranjang() {
   const refDokumen = collection(basisdata, "transaksi");
   const kueri = query(refDokumen, orderBy("nama"));
   const cuplikanKueri = await getDocs(kueri);
-
+  
   let hasilKueri = [];
   cuplikanKueri.forEach((dokumen) => {
     hasilKueri.push({
@@ -88,6 +114,10 @@ export async function ambilDaftarBarangDiKeranjang() {
       harga: dokumen.data().harga
     })
   })
-
+  
   return hasilKueri;
+}
+
+export async function hapusBarangDariKeranjang(id) {
+  await deleteDoc(doc(basisdata, "transaksi", id))
 }
