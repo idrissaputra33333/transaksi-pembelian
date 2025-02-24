@@ -114,7 +114,7 @@
       })
       
       // menghapus item dari keranjang
-      $(".link-hapus").click(async function() {
+        $("#daftar-keranjang > tody").on('clik', '. link-hapus', async function(){
         await hapusBarangDariKeranjang($(this).attr('data'))
         
         // refresh halaman
